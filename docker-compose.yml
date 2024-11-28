@@ -1,0 +1,31 @@
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: Model_Logger
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3307:3306"
+
+  mlapi:
+    build:
+      context: ./mlapi
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: Model_Logger
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - ./mlapi:/app
+
+volumes:
+  db_data:
+
